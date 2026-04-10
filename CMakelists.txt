@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(Tetris)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include_directories(include)
+
+file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+
+set(ALL_SOURCES ${SRC_FILES} main.cpp)
+
+add_executable(Tetris ${ALL_SOURCES})
+
+# 静态链接标准库，这样就不需要 libgcc_s_seh-1.dll 等文件了
+target_link_libraries(Tetris
+    -static
+    -static-libgcc
+    -static-libstdc++
+)
+
+target_link_libraries(Tetris
+    easyx
+    gdi32
+    ole32
+)
