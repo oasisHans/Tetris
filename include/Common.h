@@ -75,9 +75,6 @@ enum class Command
     EXIT
 };
 
-// 更新速度
-constexpr int updateTime = 500;
-
 // 随机数工具
 class RandomGenerator
 {

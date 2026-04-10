@@ -1,19 +1,26 @@
-🧩 C++ Tetris (OOP)
-基于 C++ & EasyX 构建的现代俄罗斯方块，采用严格的面向对象（OOP）设计。
-🌟 核心特色
-现代风格：纯白背景，无网格，全英文街机 UI。
-解耦架构：逻辑（Logic）与渲染（Render）彻底分离。
-状态机：完整支持开始、游玩、结算状态切换。
-手感优化：支持长按平滑移动及空格瞬降（Hard Drop）。
-🎮 操作说明
-Enter：开始 / 重新开始
-↑：旋转方块
-← / →：左右移动
-↓：加速下落
-Space：瞬间坠底
-Esc：退出
-🛠️ 编译说明
-安装 EasyX 图形库。
-使用 CMake 构建。
+# Tetris (OOP Version)
 
-Developer: oasis
+这是一个基于 C++ 面向对象思想开发的俄罗斯游戏。
+
+## 功能特点
+
+- 完整的面向对象架构 (Manager-Block-Map-Render-Input)
+- 状态机驱动 (支持 Start、Playing、GameOver 状态切换)
+- 现代极简风格 (白色背景、无网格线设计、全英文 UI 界面)
+- 极致操控体验 (支持平滑移动、加速下落及空格瞬间坠底)
+- 专业随机系统 (基于 std::mt19937 梅森旋转算法生成方块)
+
+## 环境依赖
+
+- 编译器：MinGW (支持 C++11)
+- 图形库：EasyX for MinGW
+- 构建工具：CMake
+
+## 如何编译
+
+1. 确保安装了 EasyX 并在 CMakeLists.txt 中配置好路径。
+2. 创建 build 目录：`mkdir build && cd build`
+3. 执行 CMake：`cmake ..`
+4. 编译：`mingw32-make`
+
+developer : oasisHans
