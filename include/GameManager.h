@@ -3,6 +3,7 @@
 #include "Block.h"
 #include "MapManager.h"
 #include "InputHandler.h"
+#include "RecordManager.h"
 #include <chrono>
 
 class Render;
@@ -13,6 +14,7 @@ private:
     GameState state;
     MapManager mapMgr;
     InputHandler input;
+    RecordManager record;
     Render *render;
     RandomGenerator rgn;
 
@@ -31,13 +33,13 @@ public:
     void run();
 
 private:
-    void handleStart();
-    void handlePlaying();
-    void handleGameOver();
+    void handleStart(Command &cmd);
+    void handleHistory(Command &cmd);
+    void handlePlaying(Command &cmd);
+    void handleGameOver(Command &cmd);
 
     void spawnNextBlock();
     bool checkCollision();
-    void processCommand(Command cmd);
     void updateautoFall();
     void resetGame();
 };

@@ -7,6 +7,7 @@
 enum class GameState
 {
     START,
+    HISTORY,
     PLAYING,
     GAMEOVER
 };
@@ -72,6 +73,7 @@ enum class Command
     ROTATE,
     DROP,
     ENTER,
+    HISTORY,
     EXIT
 };
 

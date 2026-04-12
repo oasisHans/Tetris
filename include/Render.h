@@ -13,7 +13,7 @@ private:
 
 public:
     Render();
-    void drawScene(GameState state, const MapManager &map, const Block *cur, const Block *next, int score);
+    void drawScene(GameState state, const MapManager &map, const Block *cur, const Block *next, int score, const std::vector<int> &records);
 
 private:
     void drawBoard(const MapManager &map, const Block *cur);
@@ -22,6 +22,8 @@ private:
 
     void drawStartUI();
     void drawGameOverUI(int score);
+
+    void drawHistoryUI(const std::vector<int> &records);
 
     // 获取方块颜色
     COLORREF getColor(BlockType type);

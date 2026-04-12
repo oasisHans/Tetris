@@ -26,6 +26,8 @@ public:
                     return Command::DROP;
                 case VK_RETURN:
                     return Command::ENTER;
+                case 'H':
+                    return Command::HISTORY;
                 case VK_ESCAPE:
                     return Command::EXIT;
                 }

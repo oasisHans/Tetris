@@ -6,6 +6,7 @@
 GameManager::GameManager() : state(GameState::START), curBlock(nullptr), nextBlock(nullptr)
 {
     render = new Render();
+    record.loadRecord();
     state = GameState::START;
     curBlock = nullptr;
     nextBlock = nullptr;
@@ -93,81 +94,26 @@ void GameManager::run()
         switch (state)
         {
         case GameState::START:
-            handleStart();
+            handleStart(cmd);
+            break;
+        case GameState::HISTORY:
+            handleHistory(cmd);
             break;
         case GameState::PLAYING:
-            handlePlaying();
+            handlePlaying(cmd);
             break;
         case GameState::GAMEOVER:
-            handleGameOver();
+            handleGameOver(cmd);
             break;
         }
 
-        processCommand(cmd);
-        render->drawScene(state, mapMgr, curBlock, nextBlock, score);
+        render->drawScene(state, mapMgr, curBlock, nextBlock, score, record.getAllRecords());
 
         FlushBatchDraw();
         Sleep(10);
     }
     EndBatchDraw();
     closegraph();
-}
-
-void GameManager::processCommand(Command cmd)
-{
-    if (cmd == Command::NONE)
-        return;
-
-    if (cmd == Command::ENTER)
-    {
-        if (state == GameState::START)
-        {
-            resetGame();
-            spawnNextBlock();
-            state = GameState::PLAYING;
-            lastFallTime = std::chrono::steady_clock::now();
-        }
-        else if (state == GameState::GAMEOVER)
-        {
-            state = GameState::START;
-        }
-        return;
-    }
-
-    if (state == GameState::PLAYING && curBlock)
-    {
-        switch (cmd)
-        {
-        case Command::LEFT:
-            curBlock->move({-1, 0});
-            if (checkCollision())
-                curBlock->move({1, 0});
-            break;
-        case Command::RIGHT:
-            curBlock->move({1, 0});
-            if (checkCollision())
-                curBlock->move({-1, 0});
-            break;
-        case Command::ROTATE:
-            curBlock->rotate();
-            if (checkCollision())
-                curBlock->rotateBack();
-            break;
-        case Command::DOWN:
-            curBlock->move({0, 1});
-            if (checkCollision())
-                curBlock->move({0, -1});
-            break;
-        case Command::DROP:
-            while (!checkCollision())
-            {
-                curBlock->move({0, 1});
-            }
-            curBlock->move({0, -1});
-            lastFallTime = std::chrono::steady_clock::now() - std::chrono::milliseconds(fallInterval + 1);
-            break;
-        }
-    }
 }
 
 void GameManager::updateautoFall()
@@ -190,6 +136,85 @@ void GameManager::updateautoFall()
     }
 }
 
-void GameManager::handleStart() {}
-void GameManager::handlePlaying() { updateautoFall(); }
-void GameManager::handleGameOver() {}
+// 处理各state按键输入操作
+void GameManager::handleStart(Command &cmd)
+{
+    switch (cmd)
+    {
+    case Command::ENTER:
+        resetGame();
+        spawnNextBlock();
+        this->state = GameState::PLAYING;
+        lastFallTime = std::chrono::steady_clock::now();
+        break;
+
+    case Command::HISTORY:
+        record.loadRecord();
+        this->state = GameState::HISTORY;
+    }
+}
+
+void GameManager::handleHistory(Command &cmd)
+{
+    switch (cmd)
+    {
+    case Command::DROP:
+        this->state = GameState::START;
+        break;
+
+    case Command::ENTER:
+        resetGame();
+        spawnNextBlock();
+        this->state = GameState::PLAYING;
+        lastFallTime = std::chrono::steady_clock::now();
+        break;
+    }
+}
+
+void GameManager::handlePlaying(Command &cmd)
+{
+    updateautoFall();
+
+    if (!curBlock)
+        return;
+
+    switch (cmd)
+    {
+    case Command::LEFT:
+        curBlock->move({-1, 0});
+        if (checkCollision())
+            curBlock->move({1, 0});
+        break;
+    case Command::RIGHT:
+        curBlock->move({1, 0});
+        if (checkCollision())
+            curBlock->move({-1, 0});
+        break;
+    case Command::ROTATE:
+        curBlock->rotate();
+        if (checkCollision())
+            curBlock->rotateBack();
+        break;
+    case Command::DOWN:
+        curBlock->move({0, 1});
+        if (checkCollision())
+            curBlock->move({0, -1});
+        break;
+    case Command::DROP:
+        while (!checkCollision())
+        {
+            curBlock->move({0, 1});
+        }
+        curBlock->move({0, -1});
+        lastFallTime = std::chrono::steady_clock::now() - std::chrono::milliseconds(fallInterval + 1);
+        break;
+    }
+}
+void GameManager::handleGameOver(Command &cmd)
+{
+    if (cmd == Command::ENTER)
+    {
+        record.saveRecord(score);
+        state = GameState::START;
+    }
+}

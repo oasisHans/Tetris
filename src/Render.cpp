@@ -6,7 +6,7 @@ Render::Render()
 {
 }
 
-void Render::drawScene(GameState state, const MapManager &map, const Block *cur, const Block *next, int score)
+void Render::drawScene(GameState state, const MapManager &map, const Block *cur, const Block *next, int score, const std::vector<int> &records)
 {
     setbkcolor(WHITE);
     cleardevice();
@@ -15,6 +15,9 @@ void Render::drawScene(GameState state, const MapManager &map, const Block *cur,
     {
     case GameState::START:
         drawStartUI();
+        break;
+    case GameState::HISTORY:
+        drawHistoryUI(records);
         break;
     case GameState::PLAYING:
         drawBoard(map, cur);
@@ -222,6 +225,62 @@ void Render::drawGameOverUI(int score)
     settextcolor(RGB(150, 150, 150));
     const char *restart2 = "TO RESTART";
     outtextxy((wndWIDTH - textwidth(restart2)) / 2, 600, restart2);
+}
+
+void Render::drawHistoryUI(const std::vector<int> &records)
+{
+    // 1. 装饰背景
+    setfillcolor(WHITE);
+    solidrectangle(0, 0, wndWIDTH, wndHEIGHT);
+
+    // 顶部彩色条
+    COLORREF colors[] = {RGB(255, 50, 50), RGB(255, 140, 0), RGB(255, 200, 0), RGB(50, 210, 50), RGB(0, 200, 255), RGB(0, 80, 255), RGB(160, 50, 240)};
+    int segmentWidth = wndWIDTH / 7;
+    for (int i = 0; i < 7; i++)
+    {
+        setfillcolor(colors[i]);
+        solidrectangle(i * segmentWidth, 0, (i + 1) * segmentWidth, 20);
+    }
+
+    setbkmode(TRANSPARENT);
+
+    // 2. 标题
+    settextcolor(BLACK);
+    settextstyle(60, 0, "Impact");
+    outtextxy((wndWIDTH - textwidth("TOP RECORDS")) / 2, 80, "TOP RECORDS");
+
+    // 3. 绘制前 10 名分数
+    settextstyle(25, 0, "Consolas");
+    settextcolor(RGB(50, 50, 50));
+
+    int startY = 180;
+    int limit = records.size() > 10 ? 10 : records.size();
+
+    if (limit == 0)
+    {
+        outtextxy((wndWIDTH - textwidth("NO RECORDS YET")) / 2, 300, "NO RECORDS YET");
+    }
+    else
+    {
+        for (int i = 0; i < limit; i++)
+        {
+            char buf[50];
+            sprintf_s(buf, "RANK %02d ...... %06d", i + 1, records[i]);
+            outtextxy((wndWIDTH - textwidth(buf)) / 2, startY + i * 40, buf);
+        }
+    }
+
+    // 4. 底部操作提示
+    setlinecolor(RGB(230, 230, 230));
+    line(100, 620, wndWIDTH - 100, 620);
+
+    settextstyle(20, 0, "Consolas");
+    settextcolor(RGB(150, 150, 150));
+
+    const char *hint1 = "[SPACE] BACK TO MENU";
+    const char *hint2 = "[ENTER] START GAME";
+    outtextxy((wndWIDTH - textwidth(hint1)) / 2, 640, hint1);
+    outtextxy((wndWIDTH - textwidth(hint2)) / 2, 675, hint2);
 }
 
 COLORREF Render::getColor(BlockType type)
