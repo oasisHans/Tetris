@@ -64,6 +64,7 @@ void GameManager::spawnNextBlock()
 
     if (checkCollision())
     {
+        record.saveRecord(score);
         state = GameState::GAMEOVER;
     }
 }
@@ -214,7 +215,6 @@ void GameManager::handleGameOver(Command &cmd)
 {
     if (cmd == Command::ENTER)
     {
-        record.saveRecord(score);
         state = GameState::START;
     }
 }
