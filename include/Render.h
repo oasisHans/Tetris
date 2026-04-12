@@ -11,6 +11,22 @@ private:
     const int boardY = MARGIN;
     const int sidebarX = boardX + BOARD_WIDTH + MARGIN;
 
+    COLORREF lighten(COLORREF c, double factor)
+    {
+        int r = GetRValue(c) + (int)((255 - GetRValue(c)) * factor);
+        int g = GetGValue(c) + (int)((255 - GetGValue(c)) * factor);
+        int b = GetBValue(c) + (int)((255 - GetBValue(c)) * factor);
+        return RGB(r, g, b);
+    }
+
+    COLORREF darken(COLORREF c, double factor)
+    {
+        int r = (int)(GetRValue(c) * (1 - factor));
+        int g = (int)(GetGValue(c) * (1 - factor));
+        int b = (int)(GetBValue(c) * (1 - factor));
+        return RGB(r, g, b);
+    }
+
 public:
     Render();
     void drawScene(GameState state, const MapManager &map, const Block *cur, const Block *next, int score, const std::vector<int> &records);

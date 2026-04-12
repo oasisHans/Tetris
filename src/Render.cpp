@@ -98,13 +98,68 @@ void Render::drawCell(int x, int y, BlockType type, int startX, int startY, int 
 {
     if (type == EMPTY)
         return;
-    int left = startX + x * size;
-    int top = startY + y * size;
 
-    setfillcolor(getColor(type));
+    // 1. 计算外矩形坐标
+    int L = startX + x * size;
+    int T = startY + y * size;
+    int R = L + size;
+    int B = T + size;
 
+    // 2. 计算内矩形坐标 (向内缩进 1/5)
+    int offset = size / 5;
+    int iL = L + offset, iT = T + offset, iR = R - offset, iB = B - offset;
+
+    // 3. 颜色准备
+    COLORREF baseColor = getColor(type);
+
+    // 使用 std::min 和 std::max，并显式转换类型防止歧义
+    COLORREF light = RGB(
+        std::min(255, (int)GetRValue(baseColor) + 45),
+        std::min(255, (int)GetGValue(baseColor) + 45),
+        std::min(255, (int)GetBValue(baseColor) + 45));
+    COLORREF dark = RGB(
+        std::max(0, (int)GetRValue(baseColor) - 45),
+        std::max(0, (int)GetGValue(baseColor) - 45),
+        std::max(0, (int)GetBValue(baseColor) - 45));
+
+    // 4. 绘制四个侧面 (梯形)
+    // 上
+    POINT ptsTop[] = {{L, T}, {R, T}, {iR, iT}, {iL, iT}};
+    setfillcolor(light);
+    fillpolygon(ptsTop, 4);
+
+    // 下
+    POINT ptsBottom[] = {{L, B}, {R, B}, {iR, iB}, {iL, iB}};
+    setfillcolor(dark);
+    fillpolygon(ptsBottom, 4);
+
+    // 左
+    POINT ptsLeft[] = {{L, T}, {iL, iT}, {iL, iB}, {L, B}};
+    setfillcolor(dark);
+    fillpolygon(ptsLeft, 4);
+
+    // 右
+    POINT ptsRight[] = {{R, T}, {iR, iT}, {iR, iB}, {R, B}};
+    setfillcolor(dark);
+    fillpolygon(ptsRight, 4);
+
+    // 5. 中心平面
+    setfillcolor(baseColor);
+    solidrectangle(iL, iT, iR, iB);
+
+    // 6. 宝石白线结构
     setlinecolor(WHITE);
-    fillrectangle(left, top, left + size, top + size);
+    setlinestyle(PS_SOLID, 1);
+
+    // 连线
+    line(L, T, iL, iT);
+    line(R, T, iR, iT);
+    line(L, B, iL, iB);
+    line(R, B, iR, iB);
+
+    // 外内框
+    rectangle(L, T, R, B);
+    rectangle(iL, iT, iR, iB);
 }
 
 void Render::drawStartUI()
